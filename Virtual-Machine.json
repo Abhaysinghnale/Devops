@@ -6,30 +6,24 @@
     "variables": {},
     "resources": [
         {
-            "name": "[toLower('ubuntuVM1storageabhay')]",
+            "name": "[toLower('ubuntuvm1storageabhay')]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2023-01-01",
             "location": "[resourceGroup().location]",
-            "tags": {
-                "displayName": "ubuntuVM1 Storage Account"
-            },
-            "sku": {
-                "name": "Standard_LRS"
-            },
-            "kind": "Storage"
+            "tags": { "displayName": "ubuntuVM1 Storage Account" },
+            "sku": { "name": "Standard_LRS" },
+            "kind": "StorageV2",
+            "properties": {}
         },
         {
             "name": "ubuntuVM1-PublicIP",
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2023-04-01",
             "location": "[resourceGroup().location]",
-            "tags": {
-                "displayName": "PublicIPAddress"
-            },
             "properties": {
-                "publicIPAllocationMethod": "Dynamic",
+                "publicIPAllocationMethod": "Static",
                 "dnsSettings": {
-                    "domainNameLabel": "[toLower('ubuntuVM1')]"
+                    "domainNameLabel": "[toLower('ubuntuvm1-abhay-unique')]"
                 }
             }
         },
@@ -43,7 +37,6 @@
                     {
                         "name": "nsgRule1",
                         "properties": {
-                            "description": "description",
                             "protocol": "Tcp",
                             "sourcePortRange": "*",
                             "destinationPortRange": "22",
@@ -62,18 +55,9 @@
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2023-04-01",
             "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups', 'ubuntuVM1-nsg')]"
-            ],
-            "tags": {
-                "displayName": "ubuntuVM1-VirtualNetwork"
-            },
+            "dependsOn": [ "[resourceId('Microsoft.Network/networkSecurityGroups', 'ubuntuVM1-nsg')]" ],
             "properties": {
-                "addressSpace": {
-                    "addressPrefixes": [
-                        "10.0.0.0/16"
-                    ]
-                },
+                "addressSpace": { "addressPrefixes": ["10.0.0.0/16"] },
                 "subnets": [
                     {
                         "name": "ubuntuVM1-VirtualNetwork-Subnet",
@@ -96,21 +80,14 @@
                 "[resourceId('Microsoft.Network/publicIPAddresses', 'ubuntuVM1-PublicIP')]",
                 "[resourceId('Microsoft.Network/virtualNetworks', 'ubuntuVM1-VirtualNetwork')]"
             ],
-            "tags": {
-                "displayName": "ubuntuVM1-NetworkInterface"
-            },
             "properties": {
                 "ipConfigurations": [
                     {
                         "name": "ipConfig1",
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'ubuntuVM1-PublicIP')]"
-                            },
-                            "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'ubuntuVM1-VirtualNetwork', 'ubuntuVM1-VirtualNetwork-Subnet')]"
-                            }
+                            "publicIPAddress": { "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'ubuntuVM1-PublicIP')]" },
+                            "subnet": { "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'ubuntuVM1-VirtualNetwork', 'ubuntuVM1-VirtualNetwork-Subnet')]" }
                         }
                     }
                 ]
@@ -122,48 +99,37 @@
             "apiVersion": "2023-03-01",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces', 'ubuntuVM1-NetworkInterface')]"
+                "[resourceId('Microsoft.Network/networkInterfaces', 'ubuntuVM1-NetworkInterface')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', toLower('ubuntuvm1storageabhay'))]"
             ],
-            "tags": {
-                "displayName": "ubuntuVM1"
-            },
             "properties": {
-                "hardwareProfile": {
-                    "vmSize": "Standard_A2_v2"
-                },
+                "hardwareProfile": { "vmSize": "Standard_B1s" },
                 "osProfile": {
                     "computerName": "ubuntuVM1",
                     "adminUsername": "azureuser",
-                    "adminPassword": "azureuser@123"
+                    "adminPassword": "ReplaceWithAStrongPassword123!"
                 },
                 "storageProfile": {
                     "imageReference": {
                         "publisher": "Canonical",
-                        "offer": "UbuntuServer",
-                        "sku": "16.04-LTS",
+                        "offer": "ubuntu-24_04-lts",
+                        "sku": "server",
                         "version": "latest"
                     },
-                    "osDisk": {
-                        "name": "ubuntuVM1-OSDisk",
-                        "caching": "ReadWrite",
-                        "createOption": "FromImage"
-                    }
+                    "osDisk": { "createOption": "FromImage" }
                 },
                 "networkProfile": {
                     "networkInterfaces": [
-                        {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', 'ubuntuVM1-NetworkInterface')]"
-                        }
+                        { "id": "[resourceId('Microsoft.Network/networkInterfaces', 'ubuntuVM1-NetworkInterface')]" }
                     ]
                 },
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
                         "enabled": true,
-                        "storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts/', toLower('ubuntuVM1storageabhay'))).primaryEndpoints.blob]"
+                        "storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts/', toLower('ubuntuvm1storageabhay'))).primaryEndpoints.blob]"
                     }
                 }
             }
         }
-    ],
-    "outputs": {}
+    ]
 }
