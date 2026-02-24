@@ -20,6 +20,7 @@
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2023-04-01",
             "location": "[resourceGroup().location]",
+            "sku": { "name": "Standard" },
             "properties": {
                 "publicIPAllocationMethod": "Static",
                 "dnsSettings": {
@@ -103,11 +104,11 @@
                 "[resourceId('Microsoft.Storage/storageAccounts', toLower('ubuntuvm1storageabhay'))]"
             ],
             "properties": {
-                "hardwareProfile": { "vmSize": "Standard_B1s" },
+                "hardwareProfile": { "vmSize": "Standard_B2ats_v2" },
                 "osProfile": {
                     "computerName": "ubuntuVM1",
                     "adminUsername": "azureuser",
-                    "adminPassword": "ReplaceWithAStrongPassword123!"
+                    "adminPassword": "Azure@112233"
                 },
                 "storageProfile": {
                     "imageReference": {
